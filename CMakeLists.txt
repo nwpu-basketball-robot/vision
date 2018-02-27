@@ -1,93 +1,203 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12.1)
+cmake_minimum_required(VERSION 2.8.3)
+project(object_detect)
 
-SET(CMAKE_BUILD_TYPE Release)
-PROJECT(vision CXX)
-
-set(PCL_DIR /usr/local/share/pcl-1.8)
-set(OpenCV_DIR /usr/local/share/OpenCV)
-
-find_package(PCL REQUIRED)
-find_package(OpenCV REQUIRED)
-find_package(freenect2 REQUIRED HINTS "/home/huangtairan/libfreenect2/build")
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
   rospy
   std_msgs
-  cv_bridge
-  sensor_msgs
-  geometry_msgs
-  image_geometry
-  image_transport
   message_generation
-  basketball_msgs
+  geometry_msgs
 )
 
+## System dependencies are found with CMake's conventions
+# find_package(Boost REQUIRED COMPONENTS system)
+
+
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and global scripts declared therein get installed
+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+# catkin_python_setup()
+
+################################################
+## Declare ROS messages, services and actions ##
+################################################
+
+## To declare and build messages, services or actions from within this
+## package, follow these steps:
+## * Let MSG_DEP_SET be the set of packages whose message types you use in
+##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
+## * In the file package.xml:
+##   * add a build_depend tag for "message_generation"
+##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
+##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
+##     but can be declared for certainty nonetheless:
+##     * add a run_depend tag for "message_runtime"
+## * In this file (CMakeLists.txt):
+##   * add "message_generation" and every package in MSG_DEP_SET to
+##     find_package(catkin REQUIRED COMPONENTS ...)
+##   * add "message_runtime" and every package in MSG_DEP_SET to
+##     catkin_package(CATKIN_DEPENDS ...)
+##   * uncomment the add_*_files sections below as needed
+##     and list every .msg/.srv/.action file to be processed
+##   * uncomment the generate_messages entry below
+##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
+
+## Generate messages in the 'msg' folder
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
+
+## Generate services in the 'srv' folder
+add_service_files(
+   FILES
+   volleyballdata.srv
+   cylinderdata.srv
+)
+
+## Generate actions in the 'action' folder
+# add_action_files(
+#   FILES
+#   Action1.action
+#   Action2.action
+# )
+
+## Generate added messages and services with any dependencies listed here
+generate_messages(
+   DEPENDENCIES
+   std_msgs  geometry_msgs
+)
+
+################################################
+## Declare ROS dynamic reconfigure parameters ##
+################################################
+
+## To declare and build dynamic reconfigure parameters within this
+## package, follow these steps:
+## * In the file package.xml:
+##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
+## * In this file (CMakeLists.txt):
+##   * add "dynamic_reconfigure" to
+##     find_package(catkin REQUIRED COMPONENTS ...)
+##   * uncomment the "generate_dynamic_reconfigure_options" section below
+##     and list every .cfg file to be processed
+
+## Generate dynamic reconfigure parameters in the 'cfg' folder
+# generate_dynamic_reconfigure_options(
+#   cfg/DynReconf1.cfg
+#   cfg/DynReconf2.cfg
+# )
+
+###################################
+## catkin specific configuration ##
+###################################
+## The catkin_package macro generates cmake config files for your package
+## Declare things to be passed to dependent projects
+## INCLUDE_DIRS: uncomment this if you package contains header files
+## LIBRARIES: libraries you create in this project that dependent projects also need
+## CATKIN_DEPENDS: catkin_packages dependent projects also need
+## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES vision basketball_msgs
+  LIBRARIES object_detect
   CATKIN_DEPENDS roscpp rospy std_msgs message_runtime geometry_msgs
   DEPENDS system_lib
 )
 
+###########
+## Build ##
+###########
+
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+include_directories(include)
 include_directories(
-  ${OpenCV_INCLUDE_DIRS}
-  ${freenect2_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
-include_directories ( /home/huangtairan/py-faster-rcnn/caffe-fast-rcnn/include
-     /home/huangtairan/py-faster-rcnn/lib/nms
-     /home/huangtairan/FasterRCNN-Encapsulation-Cplusplus-master/faster_cxx_lib/lib
-     /share/apps/local/include
-     /usr/local/include 
-     /usr/include/python2.7
-     /usr/local/cuda/include  )
+## Declare a C++ library
+# add_library(volleyball_detect
+#   src/${PROJECT_NAME}/volleyball_detect.cpp
+# )
+
+## Add cmake target dependencies of the library
+## as an example, code may need to be generated before libraries
+## either from message generation or dynamic reconfigure
+# add_dependencies(volleyball_detect ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Declare a C++ executable
+# add_executable(volleyball_detect_node src/volleyball_detect_node.cpp)
+
+## Add cmake target dependencies of the executable
+## same as for the library above
+# add_dependencies(volleyball_detect_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Specify libraries to link a library or executable target against
+# target_link_libraries(volleyball_detect_node
+#   ${catkin_LIBRARIES}
+# )
+
+#############
+## Install ##
+#############
+
+# all install targets should use catkin DESTINATION variables
+# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
+
+## Mark executable scripts (Python etc.) for installation
+## in contrast to setup.py, you can choose the destination
+# install(PROGRAMS
+#   scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+
+## Mark executables and/or libraries for installation
+# install(TARGETS volleyball_detect volleyball_detect_node
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+
+## Mark cpp header files for installation
+# install(DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
+# )
+
+## Mark other files for installation (e.g. launch and bag files, etc.)
+# install(FILES
+#   # myfile1
+#   # myfile2
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
+
+#############
+## Testing ##
+#############
+
+## Add gtest based cpp test target and link libraries
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_volleyball_detect.cpp)
+# if(TARGET ${PROJECT_NAME}-test)
+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+# endif()
+
+## Add folders to be run by python nosetests
+# catkin_add_nosetests(test)
+find_package(PCL 1.7.1 REQUIRED)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-if(DEPTH_REG_OPENCL)
-  add_definitions(-DDEPTH_REG_OPENCL)
-endif()
-if(DEPTH_REG_CPU)
-  add_definitions(-DDEPTH_REG_CPU)
-endif()
+include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS})
 
-add_definitions(-DDEPTH_REG_OPENCL)
-
-add_executable(vision src/main.cpp 
-            src/Judge.cpp src/Judge.h
-            src/PointCloudJudge.cpp src/PointCloudJudge.h
-            src/faster_rcnn.cpp     src/faster_rcnn.h
-            src/cylinderFindImage.cpp src/cylinderFindImage.h)
-
-target_link_libraries(vision
-  ${PCL_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-  ${freenect2_LIBRARY}
-  ${catkin_LIBRARIES}
-  /usr/local/cuda/lib64/libOpenCL.so
-
-  /home/huangtairan/py-faster-rcnn/caffe-fast-rcnn/distribute/lib/libcaffe.so  
-  /home/huangtairan/catkin_ws/src/vision/lib/libgpu_nms.so
-  /usr/lib/x86_64-linux-gnu/libglog.so
-  /usr/lib/x86_64-linux-gnu/libboost_system.so
-  /usr/lib/x86_64-linux-gnu/libboost_python.so
-  /usr/lib/x86_64-linux-gnu/libpython2.7.so
-)
-
-add_executable(vision_client src/Client.cpp)
-target_link_libraries(vision_client ${catkin_LIBRARIES})
-
-add_executable(camera_vision 
-          src/camVision.cpp src/camVision.h
-          src/cylinderFindImage.cpp src/cylinderFindImage.h)
-target_link_libraries(camera_vision 
-               ${catkin_LIBRARIES}
-               ${OpenCV_LIBRARIES})
-
-add_executable(camera_vision_client src/camVisionClient.cpp)
-target_link_libraries(camera_vision_client ${catkin_LIBRARIES})
-
+add_executable(findobject src/findobject.h src/findobject.cpp src/main.cpp)
+target_link_libraries(findobject ${PCL_LIBRARIES})
+target_link_libraries(findobject ${catkin_LIBRARIES})

@@ -1,0 +1,8 @@
+bool ball_or_cylinder
+---
+bool has_ball
+bool if_volleyball
+float64 x
+float64 y
+float64 z
+float64 theta
