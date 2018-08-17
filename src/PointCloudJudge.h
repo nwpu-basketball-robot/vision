@@ -1,6 +1,12 @@
 #ifndef POINTCLOUDJUDGE_H
 #define POINTCLOUDJUDGE_H
 
+#include <pcl/point_cloud.h>
+#include <pcl/point_traits.h>
+#include <pcl/PointIndices.h>
+#include <pcl/cloud_iterator.h>
+
+
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/ModelCoefficients.h>
@@ -36,25 +42,25 @@
 #include <cmath>
 #include <cstdio>
 
-
 typedef pcl::PointXYZ PointT;
 
 class PointCloudJudge
 {
 
-private:
+  private:
+    void computeCenter(const pcl::PointCloud<PointT>::ConstPtr &cloud_cptr,
+                       PointT &real_center);
 
-    void computeCenter(const pcl::PointCloud<PointT>::ConstPtr & cloud_cptr,
-                             PointT                            & real_center);
+    void filter(const pcl::PointCloud<PointT>::ConstPtr &cloud_cptr,
+                pcl::PointCloud<PointT>::Ptr &cloud_ptr);
 
-    void filter(const pcl::PointCloud<PointT>::ConstPtr & cloud_cptr,
-                      pcl::PointCloud<PointT>::Ptr      & cloud_ptr);
-    
-public:
+    void myCompute3DCentroid (const pcl::PointCloud<PointT> &cloud, 
+                        Eigen::Vector4f &centroid);
 
-    bool judgeCenter(const pcl::PointCloud<PointT>::ConstPtr & cloud_cptr,
-    								       pcl::PointCloud<PointT>::Ptr      & cloud_filtered,
-                           PointT                            & center);
+  public:
+    bool judgeCenter(const pcl::PointCloud<PointT>::ConstPtr &cloud_cptr,
+                     pcl::PointCloud<PointT>::Ptr &cloud_filtered,
+                     PointT &center);
 };
 
 #endif // POINTCLOUDJUDGE_H

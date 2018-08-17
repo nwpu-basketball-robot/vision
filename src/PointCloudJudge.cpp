@@ -1,4 +1,3 @@
-
 #include "PointCloudJudge.h"
 
 bool PointCloudJudge::judgeCenter(const pcl::PointCloud<PointT>::ConstPtr & cloud_cptr,
@@ -13,11 +12,6 @@ bool PointCloudJudge::judgeCenter(const pcl::PointCloud<PointT>::ConstPtr & clou
         printf("%s\n", "point cloud size after filter too little");
         return false;       
     }
-    /*
-    else
-    {
-        printf("%s %d\n", "point cloud size after filter", cloud_filtered_size );
-    }*/
 
     pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT>);
     tree->setInputCloud (cloud_filtered);
@@ -72,7 +66,13 @@ bool PointCloudJudge::judgeCenter(const pcl::PointCloud<PointT>::ConstPtr & clou
 void PointCloudJudge::computeCenter(const pcl::PointCloud<PointT>::ConstPtr & cloud_cptr,
                              			  PointT                            & real_center)
 {
-	Eigen::Vector4f centroid;
+
+    Eigen::Vector4f centroid;
+
+    // std::sort(cloud_cptr->points.begin(), cloud_cptr->points.end(),[](PointT a, PointT b){return (a.z < b.z);});
+    // std::sort(cloud_cptr->points.begin(), cloud_cptr->points.end());
+
+    // myCompute3DCentroid(*cloud_cptr, centroid);
     pcl::compute3DCentroid(*cloud_cptr, centroid);
 
     real_center.x = centroid[0];
@@ -90,6 +90,40 @@ void PointCloudJudge::filter(const pcl::PointCloud<PointT>::ConstPtr & cloud_cpt
     vg.filter (*cloud_ptr);
 }
 
+// // template <typename PointT> inline
+// void PointCloudJudge::myCompute3DCentroid (const pcl::PointCloud<PointT> &cloud, 
+//                         Eigen::Vector4f &centroid)
+// {
+//  // Initialize to 0
+//     centroid.setZero ();
+//     if (cloud.points.empty ()) 
+//        return;
+//     // For each point in the cloud
+//     int cp = 0;
 
+//       // If the data is dense, we don't need to check for NaN
+//     if (cloud.is_dense)
+//     {
+//         for (size_t i = 0; i < cloud.points.size(); ++i)
+//         centroid += cloud.points[i].getVector4fMap ();
+//         centroid[3] = 0;
+//         centroid /= cloud.points.size ();
+//     }
+//      // NaN or Inf values could exist => check for them
+//     else
+//     {
+//         for (size_t i = 0; i < cloud.points.size(); ++i)
+//         {
+//         // Check if the point is invalid
+//         if (!pcl_isfinite (cloud.points[i].x) || 
+//             !pcl_isfinite (cloud.points[i].y) || 
+//              !pcl_isfinite (cloud.points[i].z))
+//             continue;
 
-
+//         centroid += cloud.points[i].getVector4fMap ();
+//         cp++;
+//         }
+//         centroid[3] = 0;
+//         centroid /= cp;
+//     }
+// }

@@ -1,52 +1,64 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12.1)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 SET(CMAKE_BUILD_TYPE Release)
 PROJECT(vision CXX)
 
-set(PCL_DIR /usr/local/share/pcl-1.8)
-set(OpenCV_DIR /usr/local/share/OpenCV)
+# Check for c++11 support
+INCLUDE(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+IF(COMPILER_SUPPORTS_CXX11)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+ELSEIF(COMPILER_SUPPORTS_CXX0X)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+ELSE()
+  MESSAGE(ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+ENDIF()
 
-find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(freenect2 REQUIRED HINTS "/home/huangtairan/libfreenect2/build")
+find_package(OpenMP)
+find_package(PCL REQUIRED)
+find_package(freenect2 REQUIRED)
+find_package(Caffe REQUIRED)  
+add_definitions(${Caffe_DEFINITIONS}) 
+
+if(OPENMP_FOUND)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  tf
-  rospy
+  rostime
   std_msgs
-  cv_bridge
   sensor_msgs
+  message_filters
+  cv_bridge
+  image_transport
+  compressed_image_transport
+  compressed_depth_image_transport
+  kinect2_bridge  
   geometry_msgs
   image_geometry
-  image_transport
   message_generation
   basketball_msgs
 )
 
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES vision basketball_msgs
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime geometry_msgs
-  DEPENDS system_lib
+  INCLUDE_DIRS
+  LIBRARIES vision 
+  CATKIN_DEPENDS roscpp std_msgs message_runtime geometry_msgs
+  DEPENDS
 )
 
 include_directories(
   ${OpenCV_INCLUDE_DIRS}
   ${freenect2_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+  ${kinect2_bridge_INCLUDE_DIRS}
+  ${Caffe_INCLUDE_DIRS}
+  /usr/local/cuda/include
 )
-
-include_directories ( /home/huangtairan/py-faster-rcnn/caffe-fast-rcnn/include
-     /home/huangtairan/py-faster-rcnn/lib/nms
-     /home/huangtairan/FasterRCNN-Encapsulation-Cplusplus-master/faster_cxx_lib/lib
-     /share/apps/local/include
-     /usr/local/include 
-     /usr/include/python2.7
-     /usr/local/cuda/include  )
-
-include_directories(${PCL_INCLUDE_DIRS})
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
 
 if(DEPTH_REG_OPENCL)
   add_definitions(-DDEPTH_REG_OPENCL)
@@ -57,37 +69,31 @@ endif()
 
 add_definitions(-DDEPTH_REG_OPENCL)
 
-add_executable(vision src/main.cpp 
-            src/Judge.cpp src/Judge.h
-            src/PointCloudJudge.cpp src/PointCloudJudge.h
-            src/faster_rcnn.cpp     src/faster_rcnn.h
-            src/cylinderFindImage.cpp src/cylinderFindImage.h)
+#add_library(kinect2_receiver src/Receiver.cpp)
+#target_link_libraries(kinect2_receiver  
+#  ${catkin_LIBRARIES}
+#  ${OpenCV_LIBRARIES}
+#  ${PCL_LIBRARIES}  
+#  ${kinect2_bridge_LIBRARIES}
+#)
 
-target_link_libraries(vision
+add_library(pcl_judge src/PointCloudJudge.cpp)
+target_link_libraries(pcl_judge  ${OpenCV_LIBRARIES}  ${PCL_LIBRARIES})
+
+add_library(ssd_detector src/ssd_detect.cpp)
+target_link_libraries(ssd_detector   ${Caffe_LIBRARIES})
+
+add_library(cylinder_detector src/cylinderFindImage.cpp)
+target_link_libraries(cylinder_detector ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
+
+add_executable(judge src/Judge.cpp)
+target_link_libraries(judge
   ${PCL_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${freenect2_LIBRARY}
   ${catkin_LIBRARIES}
-  /usr/local/cuda/lib64/libOpenCL.so
-
-  /home/huangtairan/py-faster-rcnn/caffe-fast-rcnn/distribute/lib/libcaffe.so  
-  /home/huangtairan/catkin_ws/src/vision/lib/libgpu_nms.so
-  /usr/lib/x86_64-linux-gnu/libglog.so
-  /usr/lib/x86_64-linux-gnu/libboost_system.so
-  /usr/lib/x86_64-linux-gnu/libboost_python.so
-  /usr/lib/x86_64-linux-gnu/libpython2.7.so
+  # kinect2_receiver same effect and more complicate, not using it now
+  pcl_judge
+  ssd_detector
+  cylinder_detector
 )
-
-add_executable(vision_client src/Client.cpp)
-target_link_libraries(vision_client ${catkin_LIBRARIES})
-
-add_executable(camera_vision 
-          src/camVision.cpp src/camVision.h
-          src/cylinderFindImage.cpp src/cylinderFindImage.h)
-target_link_libraries(camera_vision 
-               ${catkin_LIBRARIES}
-               ${OpenCV_LIBRARIES})
-
-add_executable(camera_vision_client src/camVisionClient.cpp)
-target_link_libraries(camera_vision_client ${catkin_LIBRARIES})
-
