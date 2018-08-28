@@ -117,7 +117,7 @@ caffe.__version__
 对于kinect v2的配置。
 
 ```shell
-删除git clone https://github.com/OpenKinect/libfreenect2.git
+git clone https://github.com/OpenKinect/libfreenect2.git
 cd libfreenect2
 sudo apt-get install build-essential cmake pkg-config
 sudo apt-get install libusb-1.0-0-dev
@@ -180,7 +180,7 @@ rosrun vision judge # 篮球ROS通信中视觉单独测试模块
 
 数据最起码的要求是类别要对，其次是框的精度。
 
-针对于我们篮球组的特定问题，在标定的时候尽量不要把过远处的球放进来，尽量不要把模糊的球放进来，尽量保持数据分布的一致性：即最好用一个人的手机去拍照，不同手机的质量相差很大，图片在处理之后差距很大。
+针对于我们篮球组的特定问题，在标定的时候尽量不要把过远处的球放进来，尽量不要把模糊的球放进来，尽量**保持数据分布**的一致性：即最好用一个人的手机去拍照，不同手机的质量相差很大，图片在处理之后差距很大。
 
 ### 4.2 关于任务分工
 
