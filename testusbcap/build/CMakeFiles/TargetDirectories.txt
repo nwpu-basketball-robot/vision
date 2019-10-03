@@ -1,0 +1,3 @@
+/home/hisfog/testusbcap/build/CMakeFiles/edit_cache.dir
+/home/hisfog/testusbcap/build/CMakeFiles/rebuild_cache.dir
+/home/hisfog/testusbcap/build/CMakeFiles/mainfunc.dir
