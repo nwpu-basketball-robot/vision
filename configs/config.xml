@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<deep_find_cylinder>1</deep_find_cylinder>
+<blue_h_min>100</blue_h_min>
+<blue_h_max>130</blue_h_max>
+<blue_s_min>60</blue_s_min>
+<blue_s_max>205</blue_s_max>
+<blue_v_min>35</blue_v_min>
+<blue_v_max>245</blue_v_max>
+<green_h_min>45</green_h_min>
+<green_h_max>90</green_h_max>
+<green_s_min>60</green_s_min>
+<green_s_max>215</green_s_max>
+<green_v_min>25</green_v_min>
+<green_v_max>245</green_v_max>
+<middle_index>261</middle_index>
+<indexPerDegree>2.4500000000000002e+00</indexPerDegree>
+<funcRatio>0.</funcRatio>
+<degree_bias>0</degree_bias>
+<model>1</model>
+</opencv_storage>
